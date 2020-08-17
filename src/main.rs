@@ -1,11 +1,20 @@
-//mod main{}
+//extern crate s4_rs;
 
-use coffee::graphics::{self, Color, Frame, HorizontalAlignment, VerticalAlignment, Window, WindowSettings,};
+fn main() {
+    let _ = run_game();
+}
+
+pub mod types;
+//pub mod types::tile;
+//pub mod types::map;
+
+use coffee::graphics::{self, Color, Frame, HorizontalAlignment, VerticalAlignment, Window, WindowSettings};
 use coffee::load::Task;
-use coffee::{Game, Result, Timer};
+use coffee::{Game, Timer, Result};
 use coffee::ui::{button, Button, Align, Column, Element, Image, Justify, Renderer, Text, UserInterface,};
+use types::map::Map;
 
-fn main() -> Result<()> {
+pub fn run_game() -> Result<()>  {
     <MyGame as UserInterface>::run(WindowSettings {
         title: String::from("A caffeinated game"),
         size: (1280, 1024),
@@ -15,12 +24,13 @@ fn main() -> Result<()> {
     })
 }
 
-struct MyGame {
+pub struct MyGame {
     // Your game state and assets go here...
     image: graphics::Image,
     value: i32,
     increment_button: button::State,
     decrement_button: button::State,
+    map: Map,
 }
 
 impl Game for MyGame {
@@ -35,6 +45,7 @@ impl Game for MyGame {
                 value: 0,
                 increment_button: button::State::new(),
                 decrement_button: button::State::new(),
+                map: Map::new(10, 10)
             })
     }
 
@@ -70,6 +81,7 @@ impl UserInterface for MyGame {
     }
 
     fn layout(&mut self, window: &Window) -> Element<Message> {
+        let text = format!("This is an image {} {}", self.map.height.to_string(), self.map.width.to_string());
         Column::new()
             .width(window.width() as u32)
             .height(window.height() as u32)
@@ -77,7 +89,7 @@ impl UserInterface for MyGame {
             .justify_content(Justify::Center)
             .spacing(20)
             .push(
-                Text::new("This is an image")
+                Text::new(&text)
                     .size(50)
                     .height(60)
                     .horizontal_alignment(HorizontalAlignment::Center)
