@@ -1,0 +1,13 @@
+[package]
+name = "settlers_rs"
+version = "0.1.0"
+authors = ["STSchiff <chrisheib@gmx.de>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.dev]
+opt-level = 2
+
+[dependencies]
+coffee = { version = "0.4.1", features = ["vulkan"] }
