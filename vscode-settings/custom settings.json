@@ -1,0 +1,19 @@
+{
+    "files.trimTrailingWhitespace": true,
+    "git.enableSmartCommit": true,
+    "git.autofetch": true,
+    "kite.showWelcomeNotificationOnStartup": false,
+    "C_Cpp.autoAddFileAssociations": false,
+    "multiCommand.commands": [
+
+        {
+            "command": "multiCommand.RustBuildAndDebug",
+            "sequence": [
+                "workbench.action.debug.stop",
+                "workbench.action.files.saveAll",
+                "workbench.action.debug.start"
+            ]
+        }
+    ],
+    "debug.allowBreakpointsEverywhere": true
+}
