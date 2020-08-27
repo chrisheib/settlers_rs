@@ -1886,6 +1886,7 @@ version = "0.1.0"
 dependencies = [
  "coffee",
  "ndarray",
+ "rand 0.7.3",
 ]
 
 [[package]]

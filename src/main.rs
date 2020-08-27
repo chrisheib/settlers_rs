@@ -8,13 +8,18 @@ pub mod types;
 //pub mod types::tile;
 //pub mod types::map;
 
-use coffee::graphics::{self, Color, Frame, HorizontalAlignment, VerticalAlignment, Window, WindowSettings};
+use coffee::graphics::{
+    self, Color, Frame, HorizontalAlignment, VerticalAlignment, Window, WindowSettings,
+};
+
 use coffee::load::Task;
-use coffee::{Game, Timer, Result};
-use coffee::ui::{button, Button, Align, Column, Element, Image, Justify, Renderer, Text, UserInterface,};
+use coffee::ui::{
+    button, Align, Button, Column, Element, Image, Justify, Renderer, Text, UserInterface,
+};
+use coffee::{Game, Result, Timer};
 use types::map::Map;
 
-pub fn run_game() -> Result<()>  {
+pub fn run_game() -> Result<()> {
     <MyGame as UserInterface>::run(WindowSettings {
         title: String::from("A caffeinated game"),
         size: (1280, 1024),
@@ -34,28 +39,32 @@ pub struct MyGame {
 }
 
 impl Game for MyGame {
+    const TICKS_PER_SECOND: u16 = 200;
     type Input = (); // No input data
     type LoadingScreen = (); // No loading screen
 
     fn load(_window: &Window) -> Task<MyGame> {
         // Load your game assets here. Check out the `load` module!
-        graphics::Image::load("res\\img\\example.png")
-            .map(|image| MyGame {
-                image,
-                value: 0,
-                increment_button: button::State::new(),
-                decrement_button: button::State::new(),
-                map: Map::new(10, 10)
-            })
+        graphics::Image::load("res\\img\\example.png").map(|image| MyGame {
+            image,
+            value: 0,
+            increment_button: button::State::new(),
+            decrement_button: button::State::new(),
+            map: Map::new(10, 10),
+        })
     }
 
     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
-        frame.clear(Color {
-            r: 0.3,
-            g: 0.3,
-            b: 0.6,
-            a: 1.0,
-        });
+        if _timer.has_ticked(){
+            frame.clear(Color {
+                r: 0.3,
+                g: 0.3,
+                b: 0.6,
+                a: 1.0,
+            });
+
+            self.map.draw_map(frame);
+        }
     }
 }
 
@@ -81,7 +90,11 @@ impl UserInterface for MyGame {
     }
 
     fn layout(&mut self, window: &Window) -> Element<Message> {
-        let text = format!("This is an image {} {}", self.map.height.to_string(), self.map.width.to_string());
+        let text = format!(
+            "This is an image {} {}",
+            self.map.height.to_string(),
+            self.map.width.to_string()
+        );
         Column::new()
             .width(window.width() as u32)
             .height(window.height() as u32)
@@ -96,10 +109,7 @@ impl UserInterface for MyGame {
                     .vertical_alignment(VerticalAlignment::Center),
             )
             .push(Image::new(&self.image).height(250))
-            .push(
-                Button::new(&mut self.increment_button, "+")
-                    .on_press(Message::IncrementPressed),
-            )
+            .push(Button::new(&mut self.increment_button, "+").on_press(Message::IncrementPressed))
             .push(
                 Text::new(&self.value.to_string())
                     .size(50)
@@ -107,10 +117,7 @@ impl UserInterface for MyGame {
                     .horizontal_alignment(HorizontalAlignment::Center)
                     .vertical_alignment(VerticalAlignment::Center),
             )
-            .push(
-                Button::new(&mut self.decrement_button, "-")
-                    .on_press(Message::DecrementPressed),
-            )
+            .push(Button::new(&mut self.decrement_button, "-").on_press(Message::DecrementPressed))
             .into()
     }
 }
