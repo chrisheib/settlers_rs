@@ -2,8 +2,8 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"command": "build",
 			"type": "cargo",
-			"subcommand": "build",
 			"problemMatcher": [
 				"$rustc"
 			],
@@ -11,7 +11,7 @@
 				"kind": "build",
 				"isDefault": true
 			},
-			"label": "Rust: cargo build - vulkan-demo"
+			"label": "Rust: cargo build"
 		}
 	]
 }

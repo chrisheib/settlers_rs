@@ -1,4 +1,5 @@
 //extern crate s4_rs;
+// https://www.brycevandyk.com/debug-rust-on-windows-with-visual-studio-code-and-the-msvc-debugger/
 
 fn main() {
     let _ = run_game();
@@ -27,6 +28,7 @@ pub fn run_game() -> Result<()> {
         fullscreen: false,
         maximized: false,
     })
+
 }
 
 pub struct MyGame {
@@ -39,7 +41,7 @@ pub struct MyGame {
 }
 
 impl Game for MyGame {
-    const TICKS_PER_SECOND: u16 = 200;
+    const TICKS_PER_SECOND: u16 = 10;
     type Input = (); // No input data
     type LoadingScreen = (); // No loading screen
 
@@ -51,6 +53,7 @@ impl Game for MyGame {
             increment_button: button::State::new(),
             decrement_button: button::State::new(),
             map: Map::new(10, 10),
+
         })
     }
 
