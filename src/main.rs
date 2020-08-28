@@ -19,6 +19,7 @@ use coffee::ui::{
 };
 use coffee::{Game, Result, Timer};
 use types::map::Map;
+use std::{thread, time};
 
 pub fn run_game() -> Result<()> {
     <MyGame as UserInterface>::run(WindowSettings {
@@ -38,10 +39,14 @@ pub struct MyGame {
     increment_button: button::State,
     decrement_button: button::State,
     map: Map,
+    last_update : time::Instant,
+    interval : time::Duration,
 }
 
-impl Game for MyGame {
-    const TICKS_PER_SECOND: u16 = 10;
+const TARGET_FPS: u16 = 100;
+
+impl Game for MyGame{
+    const TICKS_PER_SECOND: u16 = 200;
     type Input = (); // No input data
     type LoadingScreen = (); // No loading screen
 
@@ -53,20 +58,25 @@ impl Game for MyGame {
             increment_button: button::State::new(),
             decrement_button: button::State::new(),
             map: Map::new(10, 10),
-
+            last_update : time::Instant::now(),
+            interval : time::Duration::from_millis((1000 / TARGET_FPS).into()),
         })
     }
 
     fn draw(&mut self, frame: &mut Frame, _timer: &Timer) {
         if _timer.has_ticked(){
-            frame.clear(Color {
-                r: 0.3,
-                g: 0.3,
-                b: 0.6,
-                a: 1.0,
-            });
-
-            self.map.draw_map(frame);
+            if self.last_update.elapsed() > self.interval{
+                self.last_update = time::Instant::now();
+                frame.clear(Color {
+                    r: 0.3,
+                    g: 0.3,
+                    b: 0.6,
+                    a: 1.0,
+                });
+                self.map.draw_map(frame);
+            } else {
+                thread::sleep(self.interval - self.last_update.elapsed() - time::Duration::from_millis(1));
+            }
         }
     }
 }
