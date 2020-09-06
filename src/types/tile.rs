@@ -45,11 +45,11 @@ pub struct Tile {
 }
 
 impl Tile{
-    pub fn new(tt : TileType, xx : u16, yy : u16) -> Self{
+    pub fn new(_tt : TileType, _x : u16, _y : u16) -> Self{
         Tile{
-            tile_type : tt,
-            x : xx,
-            y : yy,
+            tile_type : _tt,
+            x : _x,
+            y : _y,
         }
     }
 

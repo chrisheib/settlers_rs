@@ -19,7 +19,7 @@ use coffee::ui::{
 };
 use coffee::{Game, Result, Timer, input::KeyboardAndMouse};
 use types::map::Map;
-use std::{thread, time};
+use std::{time};
 
 pub fn run_game() -> Result<()> {
     <MyGame as UserInterface>::run(WindowSettings {
@@ -41,7 +41,10 @@ pub struct MyGame {
     map: Map,
     last_update : time::Instant,
     interval : time::Duration,
-    mouse_pressed : bool
+    lmb_down : bool,
+    rmb_down : bool,
+    cameraoffset_x : u32,
+    cameraoffset_y : u32,
 }
 
 const TARGET_FPS: u16 = 100;
@@ -59,10 +62,13 @@ impl Game for MyGame{
             value: 0,
             increment_button: button::State::new(),
             decrement_button: button::State::new(),
-            map: Map::new(10, 10),
+            map: Map::new(100, 100),
             last_update : time::Instant::now(),
             interval : time::Duration::from_millis((1000 / TARGET_FPS).into()),
-            mouse_pressed : false
+            lmb_down : false,
+            rmb_down : false,
+            cameraoffset_x : 0,
+            cameraoffset_y : 0,
         })
     }
 
@@ -86,19 +92,18 @@ impl Game for MyGame{
     fn interact(&mut self, _input: &mut Self::Input, _window: &mut Window) {
         if _input.mouse().is_cursor_within_window() & !_input.mouse().is_cursor_taken(){
             if _input.mouse().is_button_pressed(coffee::input::mouse::Button::Left){
-                if !self.mouse_pressed {
-                    self.mouse_pressed = true;
+                // Left Click
+                if !self.lmb_down {
+                    self.lmb_down = true;
                     let point = _input.mouse().cursor_position();
-                    if (point.coords.x > 0f32) & (point.coords.x < 300f32) {
-                        if (point.coords.y > 0f32) & (point.coords.y < 300f32) {
-                            let x:usize = ((point.coords.x / 30f32) as u16).into();
-                            let y:usize = ((point.coords.y / 30f32) as u16).into();
-                            self.map.tiles[x][y].tile_type = rand::random();
-                        }
+                    let x = usize::from(((point.coords.x + (self.cameraoffset_x as f32)) / 30f32) as u16);
+                    let y = usize::from(((point.coords.y + (self.cameraoffset_y as f32)) / 30f32) as u16);
+                    if (x < usize::from(self.map.width)) & (y < usize::from(self.map.height)) {
+                        self.map.tiles[x][y].tile_type = rand::random();
                     }
                 }
             } else {
-                self.mouse_pressed = false;
+                self.lmb_down = false;
             }
         }
     }
