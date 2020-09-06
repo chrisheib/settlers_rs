@@ -53,11 +53,11 @@ impl Tile{
         }
     }
 
-    pub fn draw_tile(&mut self, mesh: &mut Mesh){
+    pub fn draw_tile(&mut self, mesh: &mut Mesh, _offset_x :&i16, _offset_y : &i16){
         mesh.fill(
             Shape::Rectangle(Rectangle {
-                x: (self.x as f32) * 30f32,
-                y: (self.y as f32) * 30f32,
+                x: (self.x as f32) * 30f32 + f32::from(*_offset_x as i16),
+                y: (self.y as f32) * 30f32 + f32::from(*_offset_y as i16),
                 width: 30.0,
                 height: 30.0,
             }),

@@ -43,8 +43,10 @@ pub struct MyGame {
     interval : time::Duration,
     lmb_down : bool,
     rmb_down : bool,
-    cameraoffset_x : u32,
-    cameraoffset_y : u32,
+    last_xpos : u16,
+    last_ypos : u16,
+    cameraoffset_x : i16,
+    cameraoffset_y : i16,
 }
 
 const TARGET_FPS: u16 = 100;
@@ -67,6 +69,8 @@ impl Game for MyGame{
             interval : time::Duration::from_millis((1000 / TARGET_FPS).into()),
             lmb_down : false,
             rmb_down : false,
+            last_xpos : 0,
+            last_ypos : 0,
             cameraoffset_x : 0,
             cameraoffset_y : 0,
         })
@@ -82,7 +86,7 @@ impl Game for MyGame{
                     b: 0.6,
                     a: 1.0,
                 });
-                self.map.draw_map(frame);
+                self.map.draw_map(frame, &self.cameraoffset_x, &self.cameraoffset_y);
             } else {
                 //thread::sleep(self.interval - self.last_update.elapsed() - time::Duration::from_millis(1));
             }
@@ -96,14 +100,34 @@ impl Game for MyGame{
                 if !self.lmb_down {
                     self.lmb_down = true;
                     let point = _input.mouse().cursor_position();
-                    let x = usize::from(((point.coords.x + (self.cameraoffset_x as f32)) / 30f32) as u16);
-                    let y = usize::from(((point.coords.y + (self.cameraoffset_y as f32)) / 30f32) as u16);
+                    let x = usize::from((((point.coords.x as i16) - self.cameraoffset_x) / 30i16) as u16);
+                    let y = usize::from((((point.coords.y as i16) - self.cameraoffset_y) / 30i16) as u16);
                     if (x < usize::from(self.map.width)) & (y < usize::from(self.map.height)) {
                         self.map.tiles[x][y].tile_type = rand::random();
                     }
                 }
             } else {
                 self.lmb_down = false;
+            }
+            if _input.mouse().is_button_pressed(coffee::input::mouse::Button::Right){
+                // Click
+                if !self.rmb_down {
+                    self.rmb_down = true;
+                    self.last_xpos = _input.mouse().cursor_position().coords.x as u16;
+                    self.last_ypos = _input.mouse().cursor_position().coords.y as u16;
+                }
+                let xdiv: i16 = (_input.mouse().cursor_position().coords.x as i16) - (self.last_xpos as i16);
+                if (self.cameraoffset_x + xdiv) <= 0 {
+                    self.cameraoffset_x = self.cameraoffset_x + xdiv;
+                }
+                let ydiv: i16 = (_input.mouse().cursor_position().coords.y as i16) - (self.last_ypos as i16);
+                if (self.cameraoffset_y + ydiv) <= 0 {
+                    self.cameraoffset_y = self.cameraoffset_y + ydiv;
+                }
+                self.last_xpos = _input.mouse().cursor_position().coords.x as u16;
+                self.last_ypos = _input.mouse().cursor_position().coords.y as u16;
+            } else {
+                self.rmb_down = false;
             }
         }
     }

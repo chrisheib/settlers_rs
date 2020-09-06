@@ -29,11 +29,11 @@ impl Map {
         }
     }
 
-    pub fn draw_map(&mut self, frame: &mut Frame) {
+    pub fn draw_map(&mut self, frame: &mut Frame, _offset_x :&i16, _offset_y : &i16) {
         let mut mesh = Mesh::new();
         for a in &mut self.tiles {
             for b in a{
-                b.draw_tile(&mut mesh)
+                b.draw_tile(&mut mesh, _offset_x, _offset_y)
             }
         }
         mesh.draw(&mut frame.as_target());
