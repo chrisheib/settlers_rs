@@ -13,11 +13,11 @@ use coffee::graphics::{
     self, Color, Frame, HorizontalAlignment, VerticalAlignment, Window, WindowSettings,
 };
 
-use coffee::load::Task;
+use coffee::load::{loading_screen::ProgressBar, Task};
 use coffee::ui::{
     button, Align, Button, Column, Element, Image, Justify, Renderer, Text, UserInterface,
 };
-use coffee::{Game, Result, Timer};
+use coffee::{Game, Result, Timer, input::KeyboardAndMouse};
 use types::map::Map;
 use std::{thread, time};
 
@@ -41,14 +41,16 @@ pub struct MyGame {
     map: Map,
     last_update : time::Instant,
     interval : time::Duration,
+    mouse_pressed : bool
 }
 
 const TARGET_FPS: u16 = 100;
 
+// https://docs.rs/coffee/0.4.1/coffee/trait.Game.html
 impl Game for MyGame{
     const TICKS_PER_SECOND: u16 = 200;
-    type Input = (); // No input data
-    type LoadingScreen = (); // No loading screen
+    type Input = KeyboardAndMouse;
+    type LoadingScreen = ProgressBar; // No loading screen
 
     fn load(_window: &Window) -> Task<MyGame> {
         // Load your game assets here. Check out the `load` module!
@@ -60,6 +62,7 @@ impl Game for MyGame{
             map: Map::new(10, 10),
             last_update : time::Instant::now(),
             interval : time::Duration::from_millis((1000 / TARGET_FPS).into()),
+            mouse_pressed : false
         })
     }
 
@@ -75,7 +78,27 @@ impl Game for MyGame{
                 });
                 self.map.draw_map(frame);
             } else {
-                thread::sleep(self.interval - self.last_update.elapsed() - time::Duration::from_millis(1));
+                //thread::sleep(self.interval - self.last_update.elapsed() - time::Duration::from_millis(1));
+            }
+        }
+    }
+
+    fn interact(&mut self, _input: &mut Self::Input, _window: &mut Window) {
+        if _input.mouse().is_cursor_within_window() & !_input.mouse().is_cursor_taken(){
+            if _input.mouse().is_button_pressed(coffee::input::mouse::Button::Left){
+                if !self.mouse_pressed {
+                    self.mouse_pressed = true;
+                    let point = _input.mouse().cursor_position();
+                    if (point.coords.x > 0f32) & (point.coords.x < 300f32) {
+                        if (point.coords.y > 0f32) & (point.coords.y < 300f32) {
+                            let x:usize = ((point.coords.x / 30f32) as u16).into();
+                            let y:usize = ((point.coords.y / 30f32) as u16).into();
+                            self.map.tiles[x][y].tile_type = rand::random();
+                        }
+                    }
+                }
+            } else {
+                self.mouse_pressed = false;
             }
         }
     }

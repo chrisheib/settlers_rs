@@ -39,7 +39,7 @@ impl Distribution<TileType> for Standard {
 }
 
 pub struct Tile {
-    tile_type: TileType,
+    pub tile_type: TileType,
     pub x : u16,
     pub y : u16,
 }

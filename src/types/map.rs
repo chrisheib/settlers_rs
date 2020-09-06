@@ -5,7 +5,7 @@ pub struct Map
 {
     pub width: u16,
     pub height: u16,
-    tiles: Vec<Vec<Tile>>,
+    pub tiles: Vec<Vec<Tile>>,
 }
 
 impl Map {
