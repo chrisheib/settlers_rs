@@ -1,8 +1,8 @@
+use coffee::graphics::{Color, Frame, Rectangle, Shape};
 use rand::{
     distributions::{Distribution, Standard},
     Rng,
 };
-use coffee::graphics::{Mesh, Shape, Rectangle, Color};
 
 pub enum TileType {
     TtDirt,
@@ -13,7 +13,7 @@ pub enum TileType {
     TtRiver,
 }
 
-fn color_by_tiletype(tt:&mut TileType) -> Color{
+fn color_by_tiletype(tt: &mut TileType) -> Color {
     match tt {
         TileType::TtDirt => Color::from_rgb(148, 69, 0),
         TileType::TtSand => Color::from_rgb(92, 92, 92),
@@ -40,29 +40,38 @@ impl Distribution<TileType> for Standard {
 
 pub struct Tile {
     pub tile_type: TileType,
-    pub x : u16,
-    pub y : u16,
+    pub x: u16,
+    pub y: u16,
+    width: u16,
+    height: u16,
 }
 
-impl Tile{
-    pub fn new(_tt : TileType, _x : u16, _y : u16) -> Self{
-        Tile{
-            tile_type : _tt,
-            x : _x,
-            y : _y,
+impl Tile {
+    pub fn new(_tt: TileType, _x: u16, _y: u16) -> Self {
+        Tile {
+            tile_type: _tt,
+            x: _x,
+            y: _y,
+            width: 30,
+            height: 30,
         }
     }
+}
 
-    pub fn draw_tile(&mut self, mesh: &mut Mesh, _offset_x :&i16, _offset_y : &i16){
-        mesh.fill(
-            Shape::Rectangle(Rectangle {
-                x: (self.x as f32) * 30f32 + f32::from(*_offset_x as i16),
-                y: (self.y as f32) * 30f32 + f32::from(*_offset_y as i16),
-                width: 30.0,
-                height: 30.0,
-            }),
-            color_by_tiletype(&mut self.tile_type),
-        );
-
+impl crate::Drawable for Tile {
+    fn draw(&mut self, frame: &mut Frame, camera: &mut crate::CameraController) {
+        //if camera. todo: Nur malen, wenn auch im sichtbaren Bereich!
+        if (self.x < 10) & (self.y < 10) {
+            camera.mesh.fill(
+                Shape::Rectangle(Rectangle {
+                    x: (self.x as f32) * 30f32 + f32::from(camera.cameraoffset_x as i16),
+                    y: (self.y as f32) * 30f32 + f32::from(camera.cameraoffset_y as i16),
+                    width: 30.0,
+                    height: 30.0,
+                }),
+                color_by_tiletype(&mut self.tile_type),
+            );
+            camera.mesh.draw(&mut frame.as_target());
+        }
     }
 }
