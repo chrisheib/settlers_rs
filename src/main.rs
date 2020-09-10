@@ -61,17 +61,18 @@ pub struct CameraController {
     cameraoffset_y: i16,
     window_height: u16,
     window_width: u16,
+    //frame: Option<&'a mut Frame<'a>>, -> Geht nicht wegen lifetimes.
     mesh: Mesh,
 }
 
 pub trait Drawable {
-    fn draw(&mut self, frame: &mut Frame, camera: &mut CameraController);
+    fn draw(&mut self, camera: &mut CameraController);
 }
 
 const TARGET_FPS: u16 = 100;
 
 // https://docs.rs/coffee/0.4.1/coffee/trait.Game.html
-impl Game for MyGame {
+impl<'a> Game for MyGame {
     const TICKS_PER_SECOND: u16 = 200;
     type Input = KeyboardAndMouse;
     type LoadingScreen = ProgressBar; // No loading screen
@@ -113,7 +114,8 @@ impl Game for MyGame {
         });
         // Reset used mesh
         self.player.camera.mesh = Mesh::new();
-        self.map.draw(frame, &mut self.player.camera);
+        self.map.draw(&mut self.player.camera);
+        self.player.camera.mesh.draw(&mut frame.as_target());
     }
 
     fn interact(&mut self, _input: &mut Self::Input, _window: &mut Window) {
@@ -155,15 +157,29 @@ impl Game for MyGame {
                 let xdiv: i16 = (_input.mouse().cursor_position().coords.x as i16)
                     - (self.player.input.last_xpos as i16);
 
+                // Check, dass die Karte nicht nach unten rausläuft
                 if (self.player.camera.cameraoffset_x + xdiv) <= 0 {
-                    self.player.camera.cameraoffset_x = self.player.camera.cameraoffset_x + xdiv;
+                    // Check, das die Karte nicht nach oben rausläuft (größe + offset + xdiv > Fenster)
+                    if ((self.map.width * 30) as i16 + self.player.camera.cameraoffset_x + xdiv)
+                        > _window.width() as i16
+                    {
+                        self.player.camera.cameraoffset_x =
+                            self.player.camera.cameraoffset_x + xdiv;
+                    }
                 }
 
                 let ydiv: i16 = (_input.mouse().cursor_position().coords.y as i16)
                     - (self.player.input.last_ypos as i16);
 
+                // Check, dass die Karte nicht nach rechts rausläuft
                 if (self.player.camera.cameraoffset_y + ydiv) <= 0 {
-                    self.player.camera.cameraoffset_y = self.player.camera.cameraoffset_y + ydiv;
+                    // Check, dass die Karte nicht nach links rausläuft
+                    if ((self.map.height * 30) as i16 + self.player.camera.cameraoffset_y + ydiv)
+                        > _window.height() as i16
+                    {
+                        self.player.camera.cameraoffset_y =
+                            self.player.camera.cameraoffset_y + ydiv;
+                    }
                 }
 
                 self.player.input.last_xpos = _input.mouse().cursor_position().coords.x as u16;

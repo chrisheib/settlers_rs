@@ -1,5 +1,4 @@
 use super::tile::*;
-use coffee::graphics::Frame;
 
 pub struct Map {
     pub width: u16,
@@ -30,10 +29,10 @@ impl Map {
 }
 
 impl crate::Drawable for Map {
-    fn draw(&mut self, frame: &mut Frame, camera: &mut crate::CameraController) {
+    fn draw(&mut self, camera: &mut crate::CameraController) {
         for a in &mut self.tiles {
             for b in a {
-                b.draw(frame, camera)
+                b.draw(camera)
             }
         }
     }

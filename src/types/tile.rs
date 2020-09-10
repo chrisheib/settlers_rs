@@ -1,4 +1,4 @@
-use coffee::graphics::{Color, Frame, Rectangle, Shape};
+use coffee::graphics::{Color, Rectangle, Shape};
 use rand::{
     distributions::{Distribution, Standard},
     Rng,
@@ -59,19 +59,18 @@ impl Tile {
 }
 
 impl crate::Drawable for Tile {
-    fn draw(&mut self, frame: &mut Frame, camera: &mut crate::CameraController) {
+    fn draw(&mut self, camera: &mut crate::CameraController) {
         //if camera. todo: Nur malen, wenn auch im sichtbaren Bereich!
-        if (self.x < 10) & (self.y < 10) {
-            camera.mesh.fill(
-                Shape::Rectangle(Rectangle {
-                    x: (self.x as f32) * 30f32 + f32::from(camera.cameraoffset_x as i16),
-                    y: (self.y as f32) * 30f32 + f32::from(camera.cameraoffset_y as i16),
-                    width: 30.0,
-                    height: 30.0,
-                }),
-                color_by_tiletype(&mut self.tile_type),
-            );
-            camera.mesh.draw(&mut frame.as_target());
-        }
+        //if (self.x < 10) & (self.y < 10) {
+        camera.mesh.fill(
+            Shape::Rectangle(Rectangle {
+                x: (self.x as f32) * 30f32 + f32::from(camera.cameraoffset_x as i16),
+                y: (self.y as f32) * 30f32 + f32::from(camera.cameraoffset_y as i16),
+                width: self.width as f32,
+                height: self.height as f32,
+            }),
+            color_by_tiletype(&mut self.tile_type),
+        );
+        //}
     }
 }
