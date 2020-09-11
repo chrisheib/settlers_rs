@@ -12,7 +12,6 @@ impl Map {
         for x in 0..h {
             let mut b = Vec::<Tile>::with_capacity(w.into());
             for y in 0..w {
-                //let t = Tile::new(TileType::TtDirt, x, y);
                 let tt: TileType = rand::random();
                 let t = Tile::new(tt, x, y);
                 b.push(t)
@@ -29,10 +28,10 @@ impl Map {
 }
 
 impl crate::Drawable for Map {
-    fn draw(&mut self, camera: &mut crate::CameraController) {
+    fn draw(&mut self, param: &mut crate::DrawParameter) {
         for a in &mut self.tiles {
             for b in a {
-                b.draw(camera)
+                b.draw(param)
             }
         }
     }

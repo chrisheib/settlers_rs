@@ -25,7 +25,7 @@ use types::map::Map;
 pub fn run_game() -> Result<()> {
     <MyGame as UserInterface>::run(WindowSettings {
         title: String::from("A caffeinated game"),
-        size: (1280, 1024),
+        size: (600, 600),
         resizable: true,
         fullscreen: false,
         maximized: false,
@@ -65,8 +65,13 @@ pub struct CameraController {
     mesh: Mesh,
 }
 
+pub struct DrawParameter<'a, 'b, 'c> {
+    camera: &'b mut CameraController,
+    frame: &'a mut Frame<'c>,
+}
+
 pub trait Drawable {
-    fn draw(&mut self, camera: &mut CameraController);
+    fn draw(&mut self, param: &mut DrawParameter);
 }
 
 const TARGET_FPS: u16 = 100;
@@ -114,7 +119,11 @@ impl<'a> Game for MyGame {
         });
         // Reset used mesh
         self.player.camera.mesh = Mesh::new();
-        self.map.draw(&mut self.player.camera);
+        let mut param = DrawParameter {
+            camera: &mut self.player.camera,
+            frame,
+        };
+        self.map.draw(&mut param);
         self.player.camera.mesh.draw(&mut frame.as_target());
     }
 

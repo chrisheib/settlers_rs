@@ -11,6 +11,8 @@ pub enum TileType {
     TtRoad,
     TtOcean,
     TtRiver,
+    TtGras,
+    TtSnow,
 }
 
 fn color_by_tiletype(tt: &mut TileType) -> Color {
@@ -21,18 +23,22 @@ fn color_by_tiletype(tt: &mut TileType) -> Color {
         TileType::TtRoad => Color::from_rgb(0, 0, 0),
         TileType::TtOcean => Color::from_rgb(0, 72, 255),
         TileType::TtRiver => Color::from_rgb(0, 247, 255),
+        TileType::TtGras => Color::from_rgb(0, 200, 0),
+        TileType::TtSnow => Color::from_rgb(255, 255, 255),
     }
 }
 
 impl Distribution<TileType> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> TileType {
-        match rng.gen_range(0, 5) {
+        match rng.gen_range(0, 8) {
             0 => TileType::TtDirt,
             1 => TileType::TtSand,
             2 => TileType::TtMountain,
             3 => TileType::TtRoad,
             4 => TileType::TtOcean,
             5 => TileType::TtRiver,
+            6 => TileType::TtGras,
+            7 => TileType::TtSnow,
             _ => TileType::TtDirt,
         }
     }
@@ -59,13 +65,13 @@ impl Tile {
 }
 
 impl crate::Drawable for Tile {
-    fn draw(&mut self, camera: &mut crate::CameraController) {
+    fn draw(&mut self, param: &mut crate::DrawParameter) {
         //if camera. todo: Nur malen, wenn auch im sichtbaren Bereich!
         //if (self.x < 10) & (self.y < 10) {
-        camera.mesh.fill(
+        param.camera.mesh.fill(
             Shape::Rectangle(Rectangle {
-                x: (self.x as f32) * 30f32 + f32::from(camera.cameraoffset_x as i16),
-                y: (self.y as f32) * 30f32 + f32::from(camera.cameraoffset_y as i16),
+                x: (self.x as f32) * 30f32 + f32::from(param.camera.cameraoffset_x as i16),
+                y: (self.y as f32) * 30f32 + f32::from(param.camera.cameraoffset_y as i16),
                 width: self.width as f32,
                 height: self.height as f32,
             }),
