@@ -6,21 +6,22 @@ fn main() {
 }
 
 pub mod types;
-//pub mod types::tile;
-//pub mod types::map;
 
-use coffee::graphics::{
-    self, Color, Frame, HorizontalAlignment, VerticalAlignment, Window, WindowSettings,
+use crate::types::{
+    camera_controller::CameraController,
+    drawable::{DrawParameter, Drawable},
+    map::Map,
 };
-use graphics::Mesh;
-
-use coffee::load::{loading_screen::ProgressBar, Task};
-use coffee::ui::{
-    button, Align, Button, Column, Element, Image, Justify, Renderer, Text, UserInterface,
+use coffee::{
+    graphics::{
+        self, Color, Frame, HorizontalAlignment, Mesh, VerticalAlignment, Window, WindowSettings,
+    },
+    input::KeyboardAndMouse,
+    load::{loading_screen::ProgressBar, Task},
+    ui::{self, button, Align, Button, Column, Element, Justify, Renderer, Text, UserInterface},
+    Game, Result, Timer,
 };
-use coffee::{input::KeyboardAndMouse, Game, Result, Timer};
 use std::time;
-use types::map::Map;
 
 pub fn run_game() -> Result<()> {
     <MyGame as UserInterface>::run(WindowSettings {
@@ -54,24 +55,6 @@ pub struct PlayerInstanceController {
 pub struct InputController {
     last_xpos: u16,
     last_ypos: u16,
-}
-
-pub struct CameraController {
-    cameraoffset_x: i16,
-    cameraoffset_y: i16,
-    window_height: u16,
-    window_width: u16,
-    //frame: Option<&'a mut Frame<'a>>, -> Geht nicht wegen lifetimes.
-    mesh: Mesh,
-}
-
-pub struct DrawParameter<'a, 'b, 'c> {
-    camera: &'b mut CameraController,
-    frame: &'a mut Frame<'c>,
-}
-
-pub trait Drawable {
-    fn draw(&mut self, param: &mut DrawParameter);
 }
 
 const TARGET_FPS: u16 = 100;
@@ -222,7 +205,9 @@ impl UserInterface for MyGame {
     }
 
     fn layout(&mut self, window: &Window) -> Element<Message> {
-        let text = format!(
+        Column::new().into()
+
+        /*let text = format!(
             "This is an image {} {}",
             self.map.height.to_string(),
             self.map.width.to_string()
@@ -240,7 +225,7 @@ impl UserInterface for MyGame {
                     .horizontal_alignment(HorizontalAlignment::Center)
                     .vertical_alignment(VerticalAlignment::Center),
             )
-            .push(Image::new(&self.image).height(250))
+            .push(ui::Image::new(&self.image).height(250))
             .push(Button::new(&mut self.increment_button, "+").on_press(Message::IncrementPressed))
             .push(
                 Text::new(&self.value.to_string())
@@ -250,6 +235,6 @@ impl UserInterface for MyGame {
                     .vertical_alignment(VerticalAlignment::Center),
             )
             .push(Button::new(&mut self.decrement_button, "-").on_press(Message::DecrementPressed))
-            .into()
+            .into()*/
     }
 }
