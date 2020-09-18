@@ -72,7 +72,7 @@ impl<'a> Game for MyGame {
             value: 0,
             increment_button: button::State::new(),
             decrement_button: button::State::new(),
-            map: Map::new(100, 100),
+            map: Map::new(5, 5),
             last_update: time::Instant::now(),
             interval: time::Duration::from_millis((1000 / TARGET_FPS).into()),
             lmb_down: false,

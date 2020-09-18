@@ -1,4 +1,4 @@
-use super::tile::*;
+use super::hextile::*;
 
 pub struct Map {
     pub width: u16,
