@@ -38,10 +38,9 @@ impl Map {
         let y = pointa.coords.y;
         let width = self.tiles[0][0].width as f32;
         let height = self.tiles[0][0].height as f32;
-        let mut schaetz_x = (x / width) // breite
-            - ((y / (height * 0.75f32)) * (0.5f32 * width)) / width // row-offset
+        let mut schaetz_x = (x - x_offset as f32) / width // breite
+            - (((y - y_offset as f32) / (height * 0.75f32)) * (0.5f32 * width)) / width // row-offset
             - 0.5f32 // Schätz-Offset
-            //- x_offset as f32
             ;
 
         if schaetz_x <= -1f32 {
@@ -51,9 +50,8 @@ impl Map {
             schaetz_x = self.width as f32 - 0.51f32;
         }
 
-        let mut schaetz_y = y / (height * 0.75f32) // höhe
+        let mut schaetz_y = (y - y_offset as f32) / (height * 0.75f32) // höhe
             - 0.5f32 // Schätz-Offset
-            //- y_offset as f32
             ;
 
         if schaetz_y <= -1f32 {
