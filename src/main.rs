@@ -26,7 +26,7 @@ use std::time;
 pub fn run_game() -> Result<()> {
     <MyGame as UserInterface>::run(WindowSettings {
         title: String::from("A caffeinated game"),
-        size: (600, 600),
+        size: (400, 400),
         resizable: true,
         fullscreen: false,
         maximized: false,
@@ -72,7 +72,7 @@ impl<'a> Game for MyGame {
             value: 0,
             increment_button: button::State::new(),
             decrement_button: button::State::new(),
-            map: Map::new(5, 5),
+            map: Map::new(15, 15),
             last_update: time::Instant::now(),
             interval: time::Duration::from_millis((1000 / TARGET_FPS).into()),
             lmb_down: false,
@@ -120,7 +120,14 @@ impl<'a> Game for MyGame {
                 if !self.lmb_down {
                     self.lmb_down = true;
                     let point = _input.mouse().cursor_position();
-                    let h = self.map.tiles[0][0].height as f32;
+                    self.map
+                        .get_tile_from_coords(
+                            point,
+                            self.player.camera.cameraoffset_x,
+                            self.player.camera.cameraoffset_y,
+                        )
+                        .randomize();
+                    /*let h = self.map.tiles[0][0].height as f32;
                     let w = self.map.tiles[0][0].width as f32;
                     let (a, b) = self.map.tiles[0][0].pixel_to_pointy_hex(
                         point.coords.x - (h / 2f32) - self.player.camera.cameraoffset_x as f32,
@@ -140,8 +147,8 @@ impl<'a> Game for MyGame {
                         & (a >= 0i16)
                         & (b >= 0i16)
                     {
-                        self.map.tiles[a as usize][b as usize].tile_type = rand::random();
-                    }
+                        self.map.tiles[a as usize][b as usize].randomize();
+                    }*/
                 }
             } else {
                 self.lmb_down = false;

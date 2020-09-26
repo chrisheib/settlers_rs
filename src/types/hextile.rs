@@ -81,6 +81,10 @@ impl crate::Drawable for Tile {
 
 // https://www.redblobgames.com/grids/hexagons/
 impl Tile {
+    pub fn randomize(&mut self) {
+        self.tile_type = rand::random();
+    }
+
     fn get_hex_point_vec(&mut self, x_offset: i16, y_offset: i16) -> Vec<Point> {
         let mut polypoints: Vec<Point> = Vec::new();
         for n in 0..6 {
@@ -96,7 +100,7 @@ impl Tile {
             (self.x * self.width) as f32 //center
                 + self.width as f32 * angle_rad.cos() / 3f32.sqrt() //size
                 + x_offset as f32 // offset
-                + self.y as f32 / 2f32 * self.width as f32 // row-offset
+                + self.y as f32 / 2f32 * self.width as f32 //* angle_rad.cos() / 3f32.sqrt() // row-offset
                 + self.width as f32 / 2f32, // das erste tile soll vollständig sichtbar sein
             self.y as f32 * self.height as f32 * 0.75f32
                 + self.height as f32 * angle_rad.sin() / 2f32
@@ -105,7 +109,9 @@ impl Tile {
         );
     }
 
-    pub fn PointToCoord(&mut self, x: f32, z: f32) -> (i16, i16) {
+    // Branchless from Comment
+    // https://www.redblobgames.com/grids/hexagons/more-pixel-to-hex.html
+    pub fn point_to_coord(&mut self, x: f32, z: f32) -> (i16, i16) {
         let cx =
             x / self.width as f32 * (std::f32::consts::PI / 180f32 * (-30f32)).cos() / 3f32.sqrt();
         let cy = z / self.height as f32 * (std::f32::consts::PI / 180f32 * (-30f32)).sin() / 2f32;
@@ -125,9 +131,15 @@ impl Tile {
         return (rx as i16, ry as i16);
     }
 
+    // Original
+    // https://www.redblobgames.com/grids/hexagons/#pixel-to-hex
     pub fn pixel_to_pointy_hex(&mut self, x: f32, y: f32) -> (i16, i16) {
-        let q = (3f32.sqrt() / 3f32 * x as f32 - (1f32 / 3f32) * y as f32) / self.width as f32;
-        let r = (2f32 / 3f32 * y as f32) / self.height as f32;
+        let angle_rad = std::f32::consts::PI / 180f32 * (-30f32);
+
+        let q = (3f32.sqrt() / 3f32 * x as f32 - (1f32 / 3f32) * y as f32)
+            / (self.width as f32 * angle_rad.cos() / 3f32.sqrt() as f32);
+        let r =
+            (2f32 / 3f32 * y as f32) / (self.width as f32 * angle_rad.cos() / 3f32.sqrt() as f32);
         let (rx, ry) = self.hex_round(q, r);
         return (rx as i16, ry as i16);
     }
@@ -168,5 +180,17 @@ impl Tile {
         let z = r;
         let y = -x - z;
         return (x, y, z);
+    }
+
+    pub fn get_center(&mut self, x_offset: i16, y_offset: i16) -> Point {
+        return Point::new(
+            self.x as f32 * self.width as f32 //center
+                + x_offset as f32 // offset
+                + self.y as f32 / 2f32 * self.width as f32 // row-offset
+                + self.width as f32 / 2f32, // das erste tile soll vollständig sichtbar sein
+            self.y as f32 * self.height as f32 * 0.75f32 // center
+                + y_offset as f32 // offset
+                + self.height as f32 / 2f32, // erstes tile
+        );
     }
 }
