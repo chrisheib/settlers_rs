@@ -58,8 +58,8 @@ impl Tile {
             tile_type: _tt,
             x: _x,
             y: _y,
-            width: 30,
-            height: 20,
+            width: crate::FIELDWIDTH,
+            height: crate::FIELDHEIGHT,
         }
     }
 }
@@ -107,79 +107,6 @@ impl Tile {
                 + y_offset as f32
                 + self.height as f32 / 2f32,
         );
-    }
-
-    // Branchless from Comment
-    // https://www.redblobgames.com/grids/hexagons/more-pixel-to-hex.html
-    pub fn point_to_coord(&mut self, x: f32, z: f32) -> (i16, i16) {
-        let cx =
-            x / self.width as f32 * (std::f32::consts::PI / 180f32 * (-30f32)).cos() / 3f32.sqrt();
-        let cy = z / self.height as f32 * (std::f32::consts::PI / 180f32 * (-30f32)).sin() / 2f32;
-
-        let fx = (-2f32 / 3f32) * cx;
-        let fy = (1f32 / 3f32) * cx + (1f32 / 3f32.sqrt()) * cy;
-        let fz = (1f32 / 3f32) * cx - (1f32 / 3f32.sqrt()) * cy;
-
-        let a = (fx - fy).ceil();
-        let b = (fy - fz).ceil();
-        let c = (fz - fx).ceil();
-
-        let x2 = ((a - c) / 3f32).round();
-        let y2 = ((b - a) / 3f32).round();
-        let z2 = ((c - b) / 3f32).round();
-        let (rx, ry) = self.cube_to_axial(x2, y2, z2);
-        return (rx as i16, ry as i16);
-    }
-
-    // Original
-    // https://www.redblobgames.com/grids/hexagons/#pixel-to-hex
-    pub fn pixel_to_pointy_hex(&mut self, x: f32, y: f32) -> (i16, i16) {
-        let angle_rad = std::f32::consts::PI / 180f32 * (-30f32);
-
-        let q = (3f32.sqrt() / 3f32 * x as f32 - (1f32 / 3f32) * y as f32)
-            / (self.width as f32 * angle_rad.cos() / 3f32.sqrt() as f32);
-        let r =
-            (2f32 / 3f32 * y as f32) / (self.width as f32 * angle_rad.cos() / 3f32.sqrt() as f32);
-        let (rx, ry) = self.hex_round(q, r);
-        return (rx as i16, ry as i16);
-    }
-
-    fn hex_round(&mut self, x: f32, y: f32) -> (f32, f32) {
-        let (a, b, c) = self.axial_to_cube(x, y);
-        let (d, e, f) = self.cube_round(a, b, c);
-        return self.cube_to_axial(d, e, f);
-    }
-
-    fn cube_round(&mut self, x: f32, y: f32, z: f32) -> (f32, f32, f32) {
-        let mut rx = x.round();
-        let mut ry = y.round();
-        let mut rz = z.round();
-
-        let x_diff = (rx - x).abs();
-        let y_diff = (ry - y).abs();
-        let z_diff = (rz - z).abs();
-
-        if (x_diff > y_diff) & (x_diff > z_diff) {
-            rx = -ry - rz
-        } else if y_diff > z_diff {
-            ry = -rx - rz
-        } else {
-            rz = -rx - ry
-        }
-        return (rx, ry, rz);
-    }
-
-    fn cube_to_axial(&mut self, x: f32, y: f32, z: f32) -> (f32, f32) {
-        let q = x;
-        let r = z;
-        return (q, r);
-    }
-
-    fn axial_to_cube(&mut self, q: f32, r: f32) -> (f32, f32, f32) {
-        let x = q;
-        let z = r;
-        let y = -x - z;
-        return (x, y, z);
     }
 
     pub fn get_center(&mut self, x_offset: i16, y_offset: i16) -> Point {

@@ -9,11 +9,11 @@ pub struct Map {
 }
 
 impl Map {
-    pub fn new(h: u16, w: u16) -> Self {
-        let mut a = Vec::<Vec<Tile>>::with_capacity(h.into());
-        for x in 0..h {
-            let mut b = Vec::<Tile>::with_capacity(w.into());
-            for y in 0..w {
+    pub fn new(_x: u16, _y: u16) -> Self {
+        let mut a = Vec::<Vec<Tile>>::with_capacity(_x.into());
+        for x in 0.._x {
+            let mut b = Vec::<Tile>::with_capacity(_y.into());
+            for y in 0.._y {
                 let tt: TileType = rand::random();
                 let t = Tile::new(tt, x, y);
                 b.push(t)
@@ -22,8 +22,8 @@ impl Map {
         }
 
         Map {
-            width: w,
-            height: h,
+            width: _x,
+            height: _y,
             tiles: a,
         }
     }
@@ -139,12 +139,8 @@ impl Map {
         return resulthex;
     }
 
-    fn distance_between_two_points(
-        &mut self,
-        point_a: &coffee::graphics::Point,
-        point_b: &coffee::graphics::Point,
-    ) -> f32 {
-        let y_factor = 30f32 / 20f32;
+    fn distance_between_two_points(&mut self, point_a: &Point, point_b: &Point) -> f32 {
+        let y_factor = crate::FIELDWIDTH as f32 / crate::FIELDHEIGHT as f32;
 
         let x1 = point_a.coords.x as f32;
         let x2 = point_b.coords.x as f32;

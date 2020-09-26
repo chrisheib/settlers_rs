@@ -23,6 +23,9 @@ use coffee::{
 };
 use std::time;
 
+pub const FIELDWIDTH: u16 = 17u16;
+pub const FIELDHEIGHT: u16 = 8u16;
+
 pub fn run_game() -> Result<()> {
     <MyGame as UserInterface>::run(WindowSettings {
         title: String::from("A caffeinated game"),
@@ -72,7 +75,7 @@ impl<'a> Game for MyGame {
             value: 0,
             increment_button: button::State::new(),
             decrement_button: button::State::new(),
-            map: Map::new(15, 15),
+            map: Map::new(10, 30),
             last_update: time::Instant::now(),
             interval: time::Duration::from_millis((1000 / TARGET_FPS).into()),
             lmb_down: false,
@@ -150,13 +153,11 @@ impl<'a> Game for MyGame {
                 // Check, dass die Karte nicht nach rechts rausläuft
                 if (self.player.camera.cameraoffset_x + xdiv) <= 0 {
                     // Check, das die Karte nicht nach links rausläuft (größe + offset + xdiv > Fenster)
-                    if (
-                        //(self.map.width as f32 * 30f32) as i16
-                        ((self.map.width + (self.map.height as f32 * 0.5f32) as u16) * 30u16) as i16
-                            //+ (self.map.height as f32 * 0.5f32 * 30f32) as i16
-                            + self.player.camera.cameraoffset_x
-                            + xdiv
-                    ) > _window.width() as i16
+                    if (((self.map.width + (self.map.height as f32 * 0.5f32) as u16)
+                        * crate::FIELDWIDTH) as i16
+                        + self.player.camera.cameraoffset_x
+                        + xdiv)
+                        > _window.width() as i16
                     {
                         self.player.camera.cameraoffset_x =
                             self.player.camera.cameraoffset_x + xdiv;
