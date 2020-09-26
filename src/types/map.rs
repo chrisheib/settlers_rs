@@ -40,8 +40,7 @@ impl Map {
         let height = self.tiles[0][0].height as f32;
         let mut schaetz_x = (x - x_offset as f32) / width // breite
             - (((y - y_offset as f32) / (height * 0.75f32)) * (0.5f32 * width)) / width // row-offset
-            - 0.5f32 // Schätz-Offset
-            ;
+            - 0.5f32; // Schätz-Offset
 
         if schaetz_x <= -1f32 {
             schaetz_x = -0.99f32; // Vorher irgendwie abfangen...
@@ -51,8 +50,7 @@ impl Map {
         }
 
         let mut schaetz_y = (y - y_offset as f32) / (height * 0.75f32) // höhe
-            - 0.5f32 // Schätz-Offset
-            ;
+            - 0.5f32; // Schätz-Offset
 
         if schaetz_y <= -1f32 {
             schaetz_y = -0.99f32; // Vorher irgendwie abfangen...

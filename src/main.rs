@@ -127,28 +127,6 @@ impl<'a> Game for MyGame {
                             self.player.camera.cameraoffset_y,
                         )
                         .randomize();
-                    /*let h = self.map.tiles[0][0].height as f32;
-                    let w = self.map.tiles[0][0].width as f32;
-                    let (a, b) = self.map.tiles[0][0].pixel_to_pointy_hex(
-                        point.coords.x - (h / 2f32) - self.player.camera.cameraoffset_x as f32,
-                        point.coords.y - (w / 2f32) - self.player.camera.cameraoffset_y as f32,
-                    );
-                    /* // Für Quadrate...
-                    let x = usize::from(
-                        (((point.coords.x as i16) - self.player.camera.cameraoffset_x) / 30i16)
-                            as u16,
-                    );
-                    let y = usize::from(
-                        (((point.coords.y as i16) - self.player.camera.cameraoffset_y) / 30i16)
-                            as u16,
-                    );*/
-                    if (a < self.map.width as i16)
-                        & (b < self.map.height as i16)
-                        & (a >= 0i16)
-                        & (b >= 0i16)
-                    {
-                        self.map.tiles[a as usize][b as usize].randomize();
-                    }*/
                 }
             } else {
                 self.lmb_down = false;
@@ -167,11 +145,18 @@ impl<'a> Game for MyGame {
                 let xdiv: i16 = (_input.mouse().cursor_position().coords.x as i16)
                     - (self.player.input.last_xpos as i16);
 
-                // Check, dass die Karte nicht nach unten rausläuft
+                // todo: bei resize offset korrigieren.
+
+                // Check, dass die Karte nicht nach rechts rausläuft
                 if (self.player.camera.cameraoffset_x + xdiv) <= 0 {
-                    // Check, das die Karte nicht nach oben rausläuft (größe + offset + xdiv > Fenster)
-                    if ((self.map.width * 30) as i16 + self.player.camera.cameraoffset_x + xdiv)
-                        > _window.width() as i16
+                    // Check, das die Karte nicht nach links rausläuft (größe + offset + xdiv > Fenster)
+                    if (
+                        //(self.map.width as f32 * 30f32) as i16
+                        ((self.map.width + (self.map.height as f32 * 0.5f32) as u16) * 30u16) as i16
+                            //+ (self.map.height as f32 * 0.5f32 * 30f32) as i16
+                            + self.player.camera.cameraoffset_x
+                            + xdiv
+                    ) > _window.width() as i16
                     {
                         self.player.camera.cameraoffset_x =
                             self.player.camera.cameraoffset_x + xdiv;
@@ -181,10 +166,12 @@ impl<'a> Game for MyGame {
                 let ydiv: i16 = (_input.mouse().cursor_position().coords.y as i16)
                     - (self.player.input.last_ypos as i16);
 
-                // Check, dass die Karte nicht nach rechts rausläuft
+                // Check, dass die Karte nicht nach unten rausläuft
                 if (self.player.camera.cameraoffset_y + ydiv) <= 0 {
-                    // Check, dass die Karte nicht nach links rausläuft
-                    if ((self.map.height * 30) as i16 + self.player.camera.cameraoffset_y + ydiv)
+                    // Check, dass die Karte nicht nach oben rausläuft
+                    if (((self.map.height as f32 + 0.5f32) * 20f32 * 0.75f32) as i16
+                        + self.player.camera.cameraoffset_y
+                        + ydiv)
                         > _window.height() as i16
                     {
                         self.player.camera.cameraoffset_y =

@@ -79,4 +79,21 @@ impl crate::Drawable for Tile {
         );
         //}
     }
+
+    /* // Für Quadrate...
+    let a = usize::from(
+        (((point.coords.a as i16) - self.player.camera.cameraoffset_x) / 30i16)
+            as u16,
+    );
+    let b = usize::from(
+        (((point.coords.b as i16) - self.player.camera.cameraoffset_y) / 30i16)
+            as u16,
+    );
+    if (a < self.map.width as i16)
+        & (b < self.map.height as i16)
+        & (a >= 0i16)
+        & (b >= 0i16)
+    {
+        self.map.tiles[a as usize][b as usize].randomize();
+    }*/
 }
